@@ -5,6 +5,8 @@ import DogDetails from "./DogDetails";
 import { v1 as generateUniqueID } from "uuid";
 
 function App() {
+  const [checked, setChecked] = useState(false);
+  const [favoriteFlavor, setFavoriteFlavor] = useState("");
   const [dogs, setDogs] = useState(dogsData);
   const [showNewDogForm, setNewDogForm] = useState(false);
   const [newDog, setNewDog] = useState({
@@ -19,21 +21,26 @@ function App() {
   });
 
   function addDog() {
-    const rover = {
+    const createDog = {
       id: generateUniqueID(),
-      name: "Rover",
+      name: newDog.name,
       present: false,
       grade: 100,
-      notes: "The goodest new dog",
-      age: 5,
-      likesSwimming: true,
-      favFlavor: "beef",
-      contact: "r0v3r@yoyodyne.io",
+      notes: "",
+      age: newDog.age,
+      likesSwimming: checked,
+      favFlavor: favoriteFlavor,
+      contact: newDog.contact,
     };
-    setDogs([rover, ...dogs]);
+    setDogs([createDog, ...dogs]);
   }
 
-  function handleTextChange(event) {}
+  function handleTextChange(event) {
+    setNewDog({
+      ...newDog,
+      [event.target.id]: event.target.value,
+    });
+  }
 
   function removeDog(dogID) {
     const filteredDogArray = dogs.filter((dog) => dog.id !== dogID);
@@ -50,6 +57,37 @@ function App() {
     dogArray[index].present = !dogArray[index].present;
     setDogs(dogArray);
   }
+
+  function handleCheckboxChange() {
+    setChecked(!checked);
+  }
+
+  function handleSelectChange(event) {
+    setFavoriteFlavor(event.target.value);
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    addDog();
+    resetDogForm();
+    // toggleNewDogForm();
+  }
+
+  function resetDogForm() {
+    setNewDog({
+      id: "",
+      name: "",
+      present: false,
+      grade: 100,
+      age: "",
+      likesSwimming: "",
+      favFlavor: "",
+      contact: "",
+    });
+    setChecked(false);
+    setFavoriteFlavor("");
+  }
+
   return (
     <div className="App">
       <header>
@@ -61,7 +99,7 @@ function App() {
             {showNewDogForm ? "hide form" : "Add a new dog"}
           </button>
           {showNewDogForm ? (
-            <form>
+            <form onSubmit={handleSubmit} >
               <label htmlFor="name">Name:</label>
               <input
                 type="text"
@@ -87,7 +125,7 @@ function App() {
                 value={newDog.contact}
               />
               <label htmlFor="favFlavor">Favorite flavor:</label>
-              <select id="favFlavor">
+              <select id="favFlavor" onChange={handleSelectChange}>
                 <option value=""></option>
                 <option value="beef">Beef</option>
                 <option value="chicken">Chicken</option>
@@ -95,7 +133,7 @@ function App() {
                 <option value="bacon">Bacon</option>
               </select>
               <label>Likes swimming:</label>
-              <input type="checkbox" />
+              <input type="checkbox" checked={checked} onChange={handleCheckboxChange} />
               <br />
               <input type="submit" />
             </form>
